@@ -53,10 +53,10 @@ func _input(event):
 	
 	if Input.is_action_just_pressed("cancel_input"):
 		switch_to_normal_mode(false)
-	
-	if input_mode:
-		if Input.is_action_just_pressed("start_timer"):
-			switch_to_normal_mode(true)
+
+#	if input_mode:
+#		if Input.is_action_just_pressed("start_timer"):
+#			switch_to_normal_mode(true)
 
 func _on_SecondTimer_timeout():
 	remaining_seconds -= 1
@@ -93,6 +93,7 @@ func _on_SecondTimer_timeout():
 		format_and_set_time(remaining_hours, remaining_minutes, remaining_seconds)
 
 func _on_StartButton_pressed():
+	print("LOL")
 	if is_timed_out:
 		return
 		
