@@ -4,6 +4,7 @@ export (Texture) var start_button_icon
 export (Texture) var pause_button_icon
 export (Texture) var resume_button_icon
 
+var time_since_flash_start = 1 #Having a value of 1 will make sin(pi/2 * x) 1 which will start the flash at alpha 1
 var is_timed_out = false
 var input_mode = false
 var initial_hours = 0
@@ -22,6 +23,8 @@ func _ready():
 
 func _process(delta):
 	if input_mode:
+		time_since_flash_start += delta
+		make_timer_flash()
 		if Input.is_action_just_pressed("num0"):
 			push_array_items_left(0)
 		if Input.is_action_just_pressed("num1"):
@@ -53,10 +56,6 @@ func _input(event):
 	
 	if Input.is_action_just_pressed("cancel_input"):
 		switch_to_normal_mode(false)
-
-#	if input_mode:
-#		if Input.is_action_just_pressed("start_timer"):
-#			switch_to_normal_mode(true)
 
 func _on_SecondTimer_timeout():
 	remaining_seconds -= 1
@@ -93,7 +92,6 @@ func _on_SecondTimer_timeout():
 		format_and_set_time(remaining_hours, remaining_minutes, remaining_seconds)
 
 func _on_StartButton_pressed():
-	print("LOL")
 	if is_timed_out:
 		return
 		
@@ -124,7 +122,7 @@ func _on_ResetButton_pressed():
 	$TimeOutSound.stop()
 	
 	if input_mode:
-		input_mode = false
+		switch_to_normal_mode(false)
 		
 	$Click.play()
 	$SecondTimer.stop()
@@ -179,6 +177,7 @@ func switch_to_input_mode():
 	set_label_to_input_array(currently_displaying_time)
 
 func switch_to_normal_mode(var accept_time):
+	make_timer_normal()
 	input_mode = false
 	if accept_time:
 		initial_hours = currently_displaying_time[0][0] * 10 + currently_displaying_time[0][1]
@@ -203,3 +202,12 @@ func set_remaining_to_initial():
 	remaining_hours = initial_hours
 	remaining_minutes = initial_minutes
 	remaining_seconds = initial_seconds
+
+func make_timer_flash():
+	var color = $Label.get("custom_colors/font_color")
+	$Label.set("custom_colors/font_color", Color(color.r, color.g, color.b, abs(sin(PI / 2 * time_since_flash_start))))
+
+func make_timer_normal():
+	var color = $Label.get("custom_colors/font_color")
+	$Label.set("custom_colors/font_color", Color(color.r, color.g, color.b, 1))
+	time_since_flash_start = 1
